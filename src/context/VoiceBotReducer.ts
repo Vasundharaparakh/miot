@@ -14,6 +14,7 @@ export const INCREMENT_SLEEP_TIMER = "increment_sleep_timer";
 export const ADD_MESSAGE = "add_message";
 export const SET_PARAMS_ON_COPY_URL = "set_attach_params_to_copy_url";
 export const ADD_BEHIND_SCENES_EVENT = "add_behind_scenes_event";
+export const INJECT_USER_MESSAGE = "inject_user_message";
 
 export type VoiceBotAction =
   | { type: typeof START_LISTENING }
@@ -23,7 +24,8 @@ export type VoiceBotAction =
   | { type: typeof INCREMENT_SLEEP_TIMER }
   | { type: typeof ADD_MESSAGE; payload: ConversationMessage | LatencyMessage }
   | { type: typeof SET_PARAMS_ON_COPY_URL; payload: boolean }
-  | { type: typeof ADD_BEHIND_SCENES_EVENT; payload: BehindTheScenesEvent };
+  | { type: typeof ADD_BEHIND_SCENES_EVENT; payload: BehindTheScenesEvent }
+  | { type: typeof INJECT_USER_MESSAGE; payload: { content: string } };
 
 export const voiceBotReducer = (
   state: VoiceBotState,
@@ -53,6 +55,10 @@ export const voiceBotReducer = (
         ...state,
         behindTheScenesEvents: [...state.behindTheScenesEvents, action.payload],
       };
+    case INJECT_USER_MESSAGE:
+      // Optionally, you could log or handle this event in state
+      console.log("INJECTING  INJECT_USER_MESSAGE");
+      return state;
     default:
       return state;
   }

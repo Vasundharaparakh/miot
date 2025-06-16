@@ -40,6 +40,14 @@ export const sendKeepAliveMessage = (socket: WebSocket) => () => {
   sendSocketMessage(socket, { type: "KeepAlive" });
 };
 
+export const injectUserMessage = (socket: WebSocket, content: string) => {
+  if (socket.readyState !== WebSocket.OPEN) {
+    console.warn("WebSocket is not open, skipping inject user message");
+    return;
+  }
+  sendSocketMessage(socket, { type: "InjectUserMessage", content });
+};
+
 export interface AudioConfig {
   input: {
     encoding: string;

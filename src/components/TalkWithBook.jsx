@@ -16,7 +16,11 @@ import {
   VoiceBotStatus,
 } from "../context/VoiceBotContextProvider.jsx";
 import { createAudioBuffer, playAudioBuffer } from "../utils/audioUtils.js";
-import { sendSocketMessage, sendMicToSocket } from "../utils/deepgramUtils.js";
+import {
+  sendSocketMessage,
+  sendMicToSocket,
+  injectUserMessage,
+} from "../utils/deepgramUtils.js";
 import { isMobile } from "react-device-detect";
 import { usePrevious } from "@uidotdev/usehooks";
 import { useStsQueryParams } from "../hooks/UseStsQueryParams.jsx";
@@ -47,14 +51,14 @@ export const TalkWithBook = ({
 
   const {
     status,
-    messages,
+    // messages,
     addVoicebotMessage,
-    messageCount,
     addBehindTheScenesEvent,
     isWaitingForUserVoiceAfterSleep,
     toggleSleep,
     startListening,
     startSpeaking,
+    messageCount,
   } = useVoiceBot();
   const {
     setupMicrophone,
@@ -76,13 +80,13 @@ export const TalkWithBook = ({
   const [isInitialized, setIsInitialized] = useState(
     requiresUserActionToInitialize ? false : null,
   );
+  const [pendingInjectMessage, setPendingInjectMessage] = useState(null);
   const previousVoice = usePrevious(voice);
   const previousInstructions = usePrevious(instructions);
   const scheduledAudioSources = useRef([]);
   const [isRootPath, setIsRootPath] = useState(
     window.location.pathname === "/",
   );
-  const [activeTab, setActiveTab] = useState("clinical-notes");
 
   // AUDIO MANAGEMENT
   /**
@@ -101,11 +105,13 @@ export const TalkWithBook = ({
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (messageCount === 3) {
-  //     addVoicebotMessage({ assistant: "THREE" });
-  //   }
-  // }, [messageCount, addVoicebotMessage]);
+  useEffect(() => {
+    console.log("####### Current messageCount:", messageCount);
+    if (messageCount === 3) {
+      console.log(`setPendingInjectMessage !!!!!`);
+      setPendingInjectMessage("Tell me a joke");
+    }
+  }, [messageCount]);
 
   /**
    * Callback to handle audio data processing and playback.
@@ -411,6 +417,12 @@ export const TalkWithBook = ({
           // currently sends audio, this means Talon will deem the agent speech finished right when
           // the agent begins speaking the final sentence of its reply.
           startListening();
+          if (pendingInjectMessage) {
+            console.log("THERE IS A PENDING MESSAGE!");
+            console.log("INJECTING MESSAGE", pendingInjectMessage);
+            injectUserMessage(socket, pendingInjectMessage);
+            setPendingInjectMessage(null);
+          }
         }
         if (parsedData.type === EventType.USER_STARTED_SPEAKING) {
           isWaitingForUserVoiceAfterSleep.current = false;
@@ -428,7 +440,7 @@ export const TalkWithBook = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, socket]);
+  }, [data, socket, pendingInjectMessage]);
 
   const handleVoiceBotAction = () => {
     if (requiresUserActionToInitialize && !isInitialized) {

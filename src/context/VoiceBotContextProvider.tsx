@@ -16,6 +16,7 @@ import {
   ADD_MESSAGE,
   SET_PARAMS_ON_COPY_URL,
   ADD_BEHIND_SCENES_EVENT,
+  INJECT_USER_MESSAGE,
 } from "./VoiceBotReducer";
 
 import { USE_MOCK_DATA, mockMessages } from "../utils/mockData";
@@ -29,6 +30,7 @@ export enum EventType {
   AGENT_STARTED_SPEAKING = "AgentStartedSpeaking",
   CONVERSATION_TEXT = "ConversationText",
   END_OF_THOUGHT = "EndOfThought",
+  INJECT_USER_MESSAGE = "InjectUserMessage",
 }
 
 export type VoiceBotMessage = LatencyMessage | ConversationMessage;
@@ -229,6 +231,11 @@ export function VoiceBotProvider({ children }: Props) {
     [],
   );
 
+  const injectUserMessage = useCallback((content: string) => {
+    console.log("####### Injecting user message:", content);
+    dispatch({ type: INJECT_USER_MESSAGE, payload: { content } });
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       ...state,
@@ -242,6 +249,7 @@ export function VoiceBotProvider({ children }: Props) {
       toggleSleep,
       setAttachParamsToCopyUrl,
       messageCount: state.messageCount,
+      injectUserMessage,
     }),
     [
       state,
@@ -250,6 +258,7 @@ export function VoiceBotProvider({ children }: Props) {
       toggleSleep,
       setAttachParamsToCopyUrl,
       displayOrder,
+      injectUserMessage,
     ],
   );
 
