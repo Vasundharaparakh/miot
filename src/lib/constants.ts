@@ -94,21 +94,6 @@ export const availableVoices: Voice[] = [
       sample: "/samples/nova.mp3",
     },
   },
-  {
-    name: "Eleven",
-    canonical_name: "eleven-english-v1",
-    provider: {
-      type: "elevenlabs",
-      model: "eleven-english-v1",
-    },
-    metadata: {
-      accent: "American",
-      gender: "female",
-      image: "/voices/eleven.png",
-      color: "#45B7D1",
-      sample: "/samples/eleven.mp3",
-    },
-  },
 ];
 export const defaultVoice: Voice = availableVoices[0]!;
 
