@@ -27,11 +27,37 @@ function Transcript({ userName = "", currentCharacter }) {
     if (currentCharacter?.prompt !== "spelling") {
       return text;
     }
-
-    // Replace **word** with stars (one star per letter)
-    return text.replace(/\*\*([^*]+)\*\*/g, (match, word) => {
-      return "*".repeat(word.length);
+    text = text.replace(/(can you spell )(\w+)(\?)/gi, (match, p1, p2, p3) => {
+      return `${p1}${"*".repeat(p2.length)}${p3}`;
     });
+
+    text = text.replace(/(the word is )(\w+)(\?)/gi, (match, p1, p2, p3) => {
+      return `${p1}${"*".repeat(p2.length)}${p3}`;
+    });
+
+    // 2. Replace words between double quotes (e.g., "CAT")
+    text = text.replace(/"(\w+)"/g, (match, p1) => {
+      return `"${"*".repeat(p1.length)}"`;
+    });
+
+    // 3. Replace ALL-CAPS words (not already inside quotes)
+    // To avoid replacing inside quotes, we use a negative lookbehind for a quote and a negative lookahead for a quote
+    // This requires environments that support lookbehind (Node 10+), otherwise use a workaround
+    text = text.replace(/\b([A-Z]{2,})\b/g, (match, p1, offset, string) => {
+      // Check if the match is inside quotes
+      const before = string.lastIndexOf('"', offset);
+      const after = string.indexOf('"', offset + p1.length);
+      if (before !== -1 && after !== -1 && before < offset && after > offset) {
+        return match; // inside quotes, skip
+      }
+      return "*".repeat(p1.length);
+    });
+
+    return text;
+    // Replace **word** with stars (one star per letter)
+    // return text.replace(/\*\*([^*]+)\*\*/g, (match, word) => {
+    //   return "*".repeat(word.length);
+    // });
   };
 
   const assistantAvatarUrl = currentCharacter?.icon || assistantAvatar;
