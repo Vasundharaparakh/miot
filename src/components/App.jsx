@@ -10,6 +10,7 @@ import RewardsSection from "./sections/RewardsSection";
 import SettingsSection from "./sections/SettingsSection";
 import MapSection from "./sections/MapSection";
 import { TalkWithBook } from "./TalkWithBook";
+import ProgressSection from "./sections/ProgressSection";
 import BottomNavBar from "./common/BottomNavBar";
 
 import { VoiceBotProvider } from "../context/VoiceBotContextProvider";
@@ -261,7 +262,12 @@ const App = ({ defaultStsConfig }) => {
           />
         );
       case "profile":
-        return <ProfileSection />;
+      case "progress":
+        return (
+          <ProgressSection
+            conversationId={"7163b97f-bb82-4c30-aa72-ab204647becf"}
+          />
+        );
       case "rewards":
         return <RewardsSection />;
       case "settings":
