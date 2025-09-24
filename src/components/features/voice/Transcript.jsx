@@ -27,6 +27,11 @@ function Transcript({ userName = "", currentCharacter }) {
     if (currentCharacter?.prompt !== "spelling") {
       return text;
     }
+
+    if (/hello|enjoying/i.test(text)) {
+      return text;
+    }
+
     text = text.replace(/(can you spell )(\w+)(\?)/gi, (match, p1, p2, p3) => {
       return `${p1}${"*".repeat(p2.length)}${p3}`;
     });
